@@ -107,7 +107,6 @@ function Home() {
         <Layout>
             <Header />
             <div className="container">
-                <h2 className="text-center mt-5 mb-3">Home Page</h2>
                 <div className="d-flex justify-content-between">
                     <div className="mt-auto"><Button variant="outline-success" onClick={() => handleAdd()}>Add User</Button>{' '}</div>
                     <div className="d-flex">
@@ -162,7 +161,8 @@ function Home() {
                         ))}
                     </tbody>
                 </Table>
-                <div className="d-flex justify-content-center">
+                <div className="d-flex justify-content-between align-items-center">
+                <div class="text-muted">{ pagination.from } - { pagination.to } of { pagination.total }</div>
                     <Pagination>
                         <Pagination.First onClick={() => handlePageChange(1, pagination.first_page_url)} disabled={currentPage == 1} />
                         <Pagination.Prev
