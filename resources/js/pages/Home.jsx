@@ -5,12 +5,15 @@ import { _createUser, _deleteUser, _getUsers, _updateUser } from '../services/us
 import { Table, Button } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
+import Pagination from 'react-bootstrap/Pagination';
 
 function Home() {
 
     const [users, setUsers] = useState([]);
+    const [pagination, setPagination] = useState({});
     const [show, setShow] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
 
     const [params, setParams] = useState({
         search_query: '',
@@ -73,18 +76,26 @@ function Home() {
         }
     };
 
-    const fetchData = async () => {
+    const fetchData = async (url='') => {
         try {
-            const userData = await _getUsers('', params);
+            const userData = await _getUsers(url, params);
             setUsers(userData.data.data);
+            let { data, ...pagination } = userData.data;
+            setPagination(pagination)
+            setUsers(data);
         } catch (error) {
             console.error('Error fetching user data:', error);
         }
     };
 
+    const handlePageChange = (pageNumber, url) => {
+        fetchData(url);
+        setCurrentPage(pageNumber);
+    };
+
     useEffect(() => {
         fetchData();
-      }, [params.sort_by, params.sort_direction]);
+    }, [params.sort_by, params.sort_direction]);
 
     useEffect(() => {
         if ((params.search_query.length > 2 || params.search_query.length == 0) && users.length)
@@ -106,19 +117,19 @@ function Home() {
                             />
                         </Form.Group>&nbsp;
                         <div>
-                        <Form.Label>Sort By</Form.Label>
-                        <Form.Select aria-label="Default select example" onChange={(e)=> setParams({...params,sort_by: e.target.value})}>
-                            <option value="id">Id</option>
-                            <option value="name">Name</option>
-                            <option value="email">Email</option>
-                        </Form.Select>
+                            <Form.Label>Sort By</Form.Label>
+                            <Form.Select aria-label="Default select example" onChange={(e) => setParams({ ...params, sort_by: e.target.value })}>
+                                <option value="id">Id</option>
+                                <option value="name">Name</option>
+                                <option value="email">Email</option>
+                            </Form.Select>
                         </div>&nbsp;
                         <div>
-                        <Form.Label>Direction</Form.Label>
-                        <Form.Select aria-label="Default select example" onChange={(e)=> setParams({...params,sort_direction: e.target.value})}>
-                            <option value="asc">Asc</option>
-                            <option value="desc">desc</option>
-                        </Form.Select>
+                            <Form.Label>Direction</Form.Label>
+                            <Form.Select aria-label="Default select example" onChange={(e) => setParams({ ...params, sort_direction: e.target.value })}>
+                                <option value="asc">Asc</option>
+                                <option value="desc">desc</option>
+                            </Form.Select>
                         </div>
                     </div>
                 </div>
@@ -135,7 +146,7 @@ function Home() {
                     <tbody>
                         {users.map((user, key) => (
                             <tr key={user.id}>
-                                <td>{key + 1}</td>
+                                <td>{pagination.from + key}</td>
                                 <td>{user.name}</td>
                                 <td>{user.email}</td>
                                 <td>{(user.created_at)}</td>
@@ -151,6 +162,24 @@ function Home() {
                         ))}
                     </tbody>
                 </Table>
+                <div className="d-flex justify-content-center">
+                    <Pagination>
+                        <Pagination.First onClick={() => handlePageChange(1, pagination.first_page_url)} disabled={currentPage == 1} />
+                        <Pagination.Prev
+                            onClick={() => handlePageChange(currentPage - 1, pagination.prev_page_url)}
+                            disabled={!pagination.prev_page_url}
+                        />
+                        <Pagination.Item active>
+                            {currentPage}
+                        </Pagination.Item>
+
+                        <Pagination.Next
+                            onClick={() => handlePageChange(currentPage + 1, pagination.next_page_url)}
+                            disabled={!pagination.next_page_url}
+                        />
+                        <Pagination.Last onClick={() => handlePageChange(pagination.total, pagination.last_page_url)} disabled={currentPage == pagination.last_page} />
+                    </Pagination>
+                </div>
                 <Modal show={show} onHide={handleClose}>
                     <Form>
                         <Modal.Header closeButton>
