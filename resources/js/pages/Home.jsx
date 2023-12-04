@@ -12,6 +12,12 @@ function Home() {
     const [show, setShow] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
 
+    const [params, setParams] = useState({
+        search_query: '',
+        sort_by: 'id',
+        sort_direction: 'asc',
+    });
+
     const [formData, setFormData] = useState({
         id: null,
         name: '',
@@ -20,7 +26,7 @@ function Home() {
 
     const handleClose = () => {
         setIsEdit(false);
-        setFormData({id: null, name: '', email: ''})
+        setFormData({ id: null, name: '', email: '' })
         setShow(false);
     };
 
@@ -40,36 +46,36 @@ function Home() {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault(); 
-        try{
+        e.preventDefault();
+        try {
             const user = await _createUser(formData);
             handleClose();
             fetchData();
-        } catch(error){
+        } catch (error) {
             console.error('Error adding user:', error);
         }
     };
 
     const handleEdit = async (user) => {
-        setFormData({id: user.id, name: user.name, email: user.email});
+        setFormData({ id: user.id, name: user.name, email: user.email });
         setIsEdit(true);
         setShow(true);
     };
 
     const handleUpdate = async (e) => {
-        e.preventDefault(); 
-        try{
-            const user = await _updateUser(formData.id,formData);
+        e.preventDefault();
+        try {
+            const user = await _updateUser(formData.id, formData);
             handleClose();
             fetchData();
-        } catch(error){
+        } catch (error) {
             console.error('Error updating user:', error);
         }
     };
 
     const fetchData = async () => {
         try {
-            const userData = await _getUsers();
+            const userData = await _getUsers('', params);
             setUsers(userData.data.data);
         } catch (error) {
             console.error('Error fetching user data:', error);
@@ -78,7 +84,12 @@ function Home() {
 
     useEffect(() => {
         fetchData();
-    }, []);
+      }, [params.sort_by, params.sort_direction]);
+
+    useEffect(() => {
+        if ((params.search_query.length > 2 || params.search_query.length == 0) && users.length)
+            fetchData();
+    }, [params.search_query]);
 
 
     return (
@@ -86,7 +97,31 @@ function Home() {
             <Header />
             <div className="container">
                 <h2 className="text-center mt-5 mb-3">Home Page</h2>
-                <Button variant="outline-success" onClick={() => handleAdd()}>Add User</Button>{' '}
+                <div className="d-flex justify-content-between">
+                    <div className="mt-auto"><Button variant="outline-success" onClick={() => handleAdd()}>Add User</Button>{' '}</div>
+                    <div className="d-flex">
+                        <Form.Group className="mb-3" controlId="formBasicName">
+                            <Form.Label>Search</Form.Label>
+                            <Form.Control type="text" placeholder="Search ..." value={params.search_query} onChange={(e) => setParams({ ...params, search_query: e.target.value })}
+                            />
+                        </Form.Group>&nbsp;
+                        <div>
+                        <Form.Label>Sort By</Form.Label>
+                        <Form.Select aria-label="Default select example" onChange={(e)=> setParams({...params,sort_by: e.target.value})}>
+                            <option value="id">Id</option>
+                            <option value="name">Name</option>
+                            <option value="email">Email</option>
+                        </Form.Select>
+                        </div>&nbsp;
+                        <div>
+                        <Form.Label>Direction</Form.Label>
+                        <Form.Select aria-label="Default select example" onChange={(e)=> setParams({...params,sort_direction: e.target.value})}>
+                            <option value="asc">Asc</option>
+                            <option value="desc">desc</option>
+                        </Form.Select>
+                        </div>
+                    </div>
+                </div>
                 <Table striped bordered hover className='mt-2'>
                     <thead>
                         <tr>
