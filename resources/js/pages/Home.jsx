@@ -13,7 +13,6 @@ function Home() {
     const [pagination, setPagination] = useState({});
     const [show, setShow] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
 
     const [params, setParams] = useState({
         search_query: '',
@@ -88,9 +87,8 @@ function Home() {
         }
     };
 
-    const handlePageChange = (pageNumber, url) => {
+    const handlePageChange = (url) => {
         fetchData(url);
-        setCurrentPage(pageNumber);
     };
 
     useEffect(() => {
@@ -164,20 +162,20 @@ function Home() {
                 <div className="d-flex justify-content-between align-items-center">
                 <div class="text-muted">{ pagination.from } - { pagination.to } of { pagination.total }</div>
                     <Pagination>
-                        <Pagination.First onClick={() => handlePageChange(1, pagination.first_page_url)} disabled={currentPage == 1} />
+                        <Pagination.First onClick={() => handlePageChange(pagination.first_page_url)} disabled={pagination.current_page == 1} />
                         <Pagination.Prev
-                            onClick={() => handlePageChange(currentPage - 1, pagination.prev_page_url)}
+                            onClick={() => handlePageChange(pagination.prev_page_url)}
                             disabled={!pagination.prev_page_url}
                         />
                         <Pagination.Item active>
-                            {currentPage}
+                            {pagination.current_page}
                         </Pagination.Item>
 
                         <Pagination.Next
-                            onClick={() => handlePageChange(currentPage + 1, pagination.next_page_url)}
+                            onClick={() => handlePageChange(pagination.next_page_url)}
                             disabled={!pagination.next_page_url}
                         />
-                        <Pagination.Last onClick={() => handlePageChange(pagination.total, pagination.last_page_url)} disabled={currentPage == pagination.last_page} />
+                        <Pagination.Last onClick={() => handlePageChange(pagination.last_page_url)} disabled={pagination.current_page == pagination.last_page} />
                     </Pagination>
                 </div>
                 <Modal show={show} onHide={handleClose}>
