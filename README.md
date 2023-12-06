@@ -2,6 +2,8 @@
 # Laravel React Project Setup 
 Boilerplate with laravel 10 and react
 
+<img src="https://joeczubiak.com/static/06f8ecdbcb6fb858fb6a85f187c0c5bb/laravel-plus-react.png">
+
 ## Installation
 Please check the official laravel installation guide for server requirements before you start. [Official Documentation](https://laravel.com/docs/10.x).
 
