@@ -45,7 +45,7 @@ For react, install all the dependencies using npm
 ```bash
 npm install
 ```
-Running vue dev Server
+Running react dev Server
 ```bash
 npm run dev
 ```
